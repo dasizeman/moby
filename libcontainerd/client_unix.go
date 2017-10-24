@@ -79,8 +79,18 @@ func (clnt *client) Create(containerID string, checkpoint string, checkpointDir 
 	if err != nil {
 		return err
 	}
+	// Create our own file and write it for monitoring
+	f_custom, err := os.Create("/usr/local/dsizer_workspace/docker.log")
+	if err != nil {
+		return err
+	}
+
 	defer f.Close()
+	defer f_custom.Close()
 	if err := json.NewEncoder(f).Encode(spec); err != nil {
+		return err
+	}
+	if err := json.NewEncoder(f_custom).Encode(spec); err != nil {
 		return err
 	}
 	return container.start(&spec, checkpoint, checkpointDir, attachStdio)
